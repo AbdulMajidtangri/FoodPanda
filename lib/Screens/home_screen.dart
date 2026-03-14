@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:foodpanda_app/Models/restaurant_model.dart';
 import 'package:foodpanda_app/Providers/cart_provider.dart';
 import 'package:foodpanda_app/Providers/profile_provider.dart';
+import 'package:foodpanda_app/Providers/favorite_provider.dart';
 import 'package:foodpanda_app/Screens/restaurant_detail_screen.dart';
+import 'package:foodpanda_app/Screens/favorites_screen.dart';
+import 'package:foodpanda_app/Screens/orders_screen.dart';
+import 'package:foodpanda_app/Screens/profile_screen.dart';
 import 'package:foodpanda_app/utils/app_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -120,7 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (_, profile, __) => InkWell(
               onTap: () {
                 Navigator.pop(context);
-                Navigator.pushNamed(context, '/profile');
+                setState(() {
+                  _currentIndex = 3;
+                });
               },
               child: UserAccountsDrawerHeader(
                 decoration: BoxDecoration(color: AppTheme.primaryColor),
@@ -149,12 +155,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ListTile(
             leading: Icon(Icons.favorite),
             title: Text('Favorites'),
-            onTap: () {},
+            onTap: () {
+              Navigator.pop(context); // Close Drawer
+              setState(() {
+                _currentIndex = 1;
+              });
+            },
           ),
           ListTile(
             leading: Icon(Icons.history),
             title: Text('Orders'),
-            onTap: () {},
+            onTap: () {
+              Navigator.pop(context); // Close Drawer
+              setState(() {
+                _currentIndex = 2;
+              });
+            },
           ),
           Divider(),
           ListTile(
@@ -228,333 +244,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: _buildDrawer(),
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          // STICKY APP BAR
-          SliverAppBar(
-            pinned: true,
-            floating: false,
-            expandedHeight: 115.0,
-            backgroundColor: AppTheme.primaryColor,
-            elevation: 0,
-            centerTitle: false,
-            titleSpacing: -4,
-            title: Row(
-              children: [
-                InkWell(
-                  onTap: _showAddressSelector,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Delivering to',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            _selectedAddress,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              Consumer<CartProvider>(
-                builder: (_, cart, ch) => Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Center(
-                    child: Badge(
-                      label: Text(cart.itemCount.toString()),
-                      isLabelVisible: cart.itemCount > 0,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.shopping_bag_outlined,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/cart');
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: IconButton(
-                  icon: Icon(Icons.person_outline, color: Colors.white),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/profile');
-                  },
-                ),
-              ),
-            ],
-            bottom: PreferredSize(
-              preferredSize: Size.fromHeight(60),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: double.infinity,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(color: Colors.black12, blurRadius: 4),
-                              ],
-                            ),
-                            child: TextField(
-                              controller: _searchController,
-                              style: TextStyle(fontSize: 13),
-                              decoration: InputDecoration(
-                                hintText: 'Search for shops & restaurants',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey[400],
-                                  fontSize: 12,
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.search,
-                                  color: AppTheme.primaryColor,
-                                  size: 18,
-                                ),
-                                border: InputBorder.none,
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 8),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Container(
-                          height: 36,
-                          width: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(color: Colors.black12, blurRadius: 4),
-                            ],
-                          ),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: Icon(
-                              Icons.tune,
-                              color: AppTheme.primaryColor,
-                              size: 18,
-                            ),
-                            onPressed: () {
-                              // Filter logic
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // HERO SECTION
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // HERO BANNER CAROUSEL
-                SizedBox(height: 15),
-                CarouselSlider(
-                  options: CarouselOptions(
-                    height: 160.0,
-                    autoPlay: true,
-                    enlargeCenterPage: true,
-                    viewportFraction: 0.88,
-                    aspectRatio: 16 / 9,
-                    initialPage: 0,
-                  ),
-                  items:
-                      [
-                        'assets/images/burgerking.png',
-                        'assets/images/mcdonalds.png',
-                        'assets/images/kfc.png',
-                        'assets/images/dominos.png',
-                      ].map((i) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: EdgeInsets.symmetric(horizontal: 5.0),
-                              decoration: BoxDecoration(
-                                color: Colors.pink[50],
-                                borderRadius: BorderRadius.circular(16),
-                                image: DecorationImage(
-                                  image: AssetImage(i),
-                                  fit: BoxFit.cover,
-                                  onError: (_, __) {},
-                                ),
-                              ),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                    colors: [
-                                      Colors.black.withOpacity(0.7),
-                                      Colors.transparent,
-                                    ],
-                                  ),
-                                ),
-                                padding: EdgeInsets.all(15),
-                                alignment: Alignment.bottomLeft,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'FLASH DEAL',
-                                      style: TextStyle(
-                                        color: AppTheme.primaryColor,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w900,
-                                        backgroundColor: Colors.white,
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      '50% OFF TODAY!',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      }).toList(),
-                ),
-
-                SizedBox(height: 20),
-
-                // CUISINES
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Cuisines',
-                        style: AppTheme.headline1.copyWith(fontSize: 18),
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'View all',
-                          style: TextStyle(
-                            color: AppTheme.primaryColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 5),
-                SizedBox(
-                  height: 100,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    children: [
-                      _buildCuisineItem(
-                        'Burgers',
-                        'assets/images/burgerking.png',
-                      ),
-                      _buildCuisineItem('Pizza', 'assets/images/dominos.png'),
-                      _buildCuisineItem('Healthy', 'assets/images/subway.png'),
-                      _buildCuisineItem(
-                        'Fast Food',
-                        'assets/images/mcdonalds.png',
-                      ),
-                      _buildCuisineItem('Chicken', 'assets/images/kfc.png'),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    _selectedCategory == 'All' ? 'All Restaurants' : '$_selectedCategory',
-                    style: AppTheme.headline1.copyWith(fontSize: 20),
-                  ),
-                ),
-                SizedBox(height: 10),
-              ],
-            ),
-          ),
-
-          // RESTAURANT LIST
-          _filteredRestaurants.isEmpty
-              ? SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(50.0),
-                    child: Center(child: Text("No restaurants found")),
-                  ),
-                )
-              : SliverPadding(
-                  padding: EdgeInsets.fromLTRB(20, 8, 20, 32),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: _buildRestaurantCard(
-                            _filteredRestaurants[index],
-                          ),
-                        );
-                      },
-                      childCount: _filteredRestaurants.length,
-                    ),
-                  ),
-                ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          _buildHomeContent(),
+          const FavoritesScreen(),
+          const OrdersScreen(),
+          const ProfileScreen(),
         ],
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         selectedItemColor: AppTheme.primaryColor,
@@ -562,31 +260,27 @@ class _HomeScreenState extends State<HomeScreen> {
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
           if (index == 0) {
-            setState(() {
-              _currentIndex = 0;
-            });
             _scrollController.animateTo(
               0,
-              duration: Duration(milliseconds: 400),
+              duration: const Duration(milliseconds: 400),
               curve: Curves.easeOut,
             );
-          } else if (index == 1) {
-            setState(() {
-              _currentIndex = 0;
-            });
-            Navigator.pushNamed(context, '/orders');
-          } else if (index == 2) {
-            setState(() {
-              _currentIndex = 0;
-            });
-            Navigator.pushNamed(context, '/profile');
           }
         },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
             label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_border),
+            activeIcon: Icon(Icons.favorite),
+            label: 'Favorites',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.receipt_long),
@@ -598,6 +292,336 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildHomeContent() {
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        // STICKY APP BAR
+        SliverAppBar(
+          pinned: true,
+          floating: false,
+          expandedHeight: 115.0,
+          backgroundColor: AppTheme.primaryColor,
+          elevation: 0,
+          centerTitle: false,
+          titleSpacing: -4,
+          title: Row(
+            children: [
+              InkWell(
+                onTap: _showAddressSelector,
+                borderRadius: BorderRadius.circular(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Delivering to',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          _selectedAddress,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            Consumer<CartProvider>(
+              builder: (_, cart, ch) => Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Center(
+                  child: Badge(
+                    label: Text(cart.itemCount.toString()),
+                    isLabelVisible: cart.itemCount > 0,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.shopping_bag_outlined,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/cart');
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                icon: Icon(Icons.person_outline, color: Colors.white),
+                onPressed: () {
+                  setState(() => _currentIndex = 3);
+                },
+              ),
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(60),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: double.infinity,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(color: Colors.black12, blurRadius: 4),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            style: TextStyle(fontSize: 13),
+                            decoration: InputDecoration(
+                              hintText: 'Search for shops & restaurants',
+                              hintStyle: TextStyle(
+                                color: Colors.grey[400],
+                                fontSize: 12,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: AppTheme.primaryColor,
+                                size: 18,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding:
+                                  EdgeInsets.symmetric(vertical: 8),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Container(
+                        height: 36,
+                        width: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black12, blurRadius: 4),
+                          ],
+                        ),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: Icon(
+                            Icons.tune,
+                            color: AppTheme.primaryColor,
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            // Filter logic
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // HERO SECTION
+        SliverToBoxAdapter(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // HERO BANNER CAROUSEL
+              SizedBox(height: 15),
+              CarouselSlider(
+                options: CarouselOptions(
+                  height: 160.0,
+                  autoPlay: true,
+                  enlargeCenterPage: true,
+                  viewportFraction: 0.88,
+                  aspectRatio: 16 / 9,
+                  initialPage: 0,
+                ),
+                items: [
+                  'assets/images/burgerking.png',
+                  'assets/images/mcdonalds.png',
+                  'assets/images/kfc.png',
+                  'assets/images/dominos.png',
+                ].map((i) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: BoxDecoration(
+                          color: Colors.pink[50],
+                          borderRadius: BorderRadius.circular(16),
+                          image: DecorationImage(
+                            image: AssetImage(i),
+                            fit: BoxFit.cover,
+                            onError: (_, __) {},
+                          ),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.7),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                          padding: EdgeInsets.all(15),
+                          alignment: Alignment.bottomLeft,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'FLASH DEAL',
+                                style: TextStyle(
+                                  color: AppTheme.primaryColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  backgroundColor: Colors.white,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                '50% OFF TODAY!',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }).toList(),
+              ),
+
+              SizedBox(height: 20),
+
+              // CUISINES
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Cuisines',
+                      style: AppTheme.headline1.copyWith(fontSize: 18),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'View all',
+                        style: TextStyle(
+                          color: AppTheme.primaryColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 5),
+              SizedBox(
+                height: 100,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  children: [
+                    _buildCuisineItem(
+                      'Burgers',
+                      'assets/images/burgerking.png',
+                    ),
+                    _buildCuisineItem('Pizza', 'assets/images/dominos.png'),
+                    _buildCuisineItem('Healthy', 'assets/images/subway.png'),
+                    _buildCuisineItem(
+                      'Fast Food',
+                      'assets/images/mcdonalds.png',
+                    ),
+                    _buildCuisineItem('Chicken', 'assets/images/kfc.png'),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  _selectedCategory == 'All'
+                      ? 'All Restaurants'
+                      : '$_selectedCategory',
+                  style: AppTheme.headline1.copyWith(fontSize: 20),
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
+        ),
+
+        // RESTAURANT LIST
+        _filteredRestaurants.isEmpty
+            ? SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(50.0),
+                  child: Center(child: Text("No restaurants found")),
+                ),
+              )
+            : SliverPadding(
+                padding: EdgeInsets.fromLTRB(20, 8, 20, 32),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: _buildRestaurantCard(
+                          _filteredRestaurants[index],
+                        ),
+                      );
+                    },
+                    childCount: _filteredRestaurants.length,
+                  ),
+                ),
+              ),
+      ],
     );
   }
 
@@ -801,10 +825,37 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          const Icon(
-                            Icons.favorite_border,
-                            size: 20,
-                            color: Colors.grey,
+                          Consumer<FavoriteProvider>(
+                            builder: (ctx, favoriteProvider, _) {
+                              final isFavorite = favoriteProvider.isFavorite(restaurant.id);
+                              return GestureDetector(
+                                onTap: () {
+                                  favoriteProvider.toggleFavorite(restaurant);
+                                  
+                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        favoriteProvider.isFavorite(restaurant.id) 
+                                          ? 'Added to favorites' 
+                                          : 'Removed from favorites',
+                                      ),
+                                      duration: const Duration(seconds: 1),
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: AppTheme.primaryColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Icon(
+                                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                                  size: 22,
+                                  color: isFavorite ? AppTheme.primaryColor : Colors.grey,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

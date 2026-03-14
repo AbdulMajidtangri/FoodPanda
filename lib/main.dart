@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodpanda_app/Providers/cart_provider.dart';
 import 'package:foodpanda_app/Providers/profile_provider.dart';
+import 'package:foodpanda_app/Providers/favorite_provider.dart';
 import 'package:foodpanda_app/Screens/ChickenCategoryScreen.dart';
 import 'package:foodpanda_app/Screens/Login_Screen.dart';
 import 'package:foodpanda_app/Screens/PizzaCategoryScreen.dart';
@@ -13,6 +14,7 @@ import 'package:foodpanda_app/Screens/profile_screen.dart';
 import 'package:foodpanda_app/Screens/checkout_screen.dart';
 import 'package:foodpanda_app/Screens/delivery_addresses_screen.dart';
 import 'package:foodpanda_app/Screens/payment_methods_screen.dart';
+import 'package:foodpanda_app/Screens/favorites_screen.dart';
 import 'package:foodpanda_app/utils/app_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => FavoriteProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -48,6 +51,7 @@ class MyApp extends StatelessWidget {
           '/profile': (context) => const ProfileScreen(),
           '/addresses': (context) => const DeliveryAddressesScreen(),
           '/payments': (context) => const PaymentMethodsScreen(),
+          '/favorites': (context) => const FavoritesScreen(),
         },
       ),
     );
